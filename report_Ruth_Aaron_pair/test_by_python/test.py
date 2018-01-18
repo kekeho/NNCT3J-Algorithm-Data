@@ -32,9 +32,14 @@ def checkRuthAaronPair(start, stop):
 
 def main(start, stop):
     pair = checkRuthAaronPair(start, stop)
-    for p in pair:
-        print(p)
+    with open('result.txt', mode='w') as file:
+        for p in pair:
+            file.write('{},{}\n'.format(p[0], p[1]))
 
 
 if __name__ == '__main__':
-    main(int(sys.argv[1]), int(sys.argv[2]))
+    try:
+        main(int(sys.argv[1]), int(sys.argv[2]))
+    except IndexError as e:
+        print("ERROR!: missing arguments")
+        print("USAGE:\n\ttest.py <start> <end>")
