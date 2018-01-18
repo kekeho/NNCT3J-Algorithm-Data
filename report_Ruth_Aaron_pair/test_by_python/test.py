@@ -17,7 +17,7 @@ def makePair(num):
     for k, v in pair2_dict.items():
         for i in range(v):
             y += k
-    return (x, y)
+    return (x, y, num)
 
 
 def checkRuthAaronPair(start, stop):
@@ -25,7 +25,7 @@ def checkRuthAaronPair(start, stop):
     for i in range(start, stop):
         pair = makePair(i)
         if pair[0] == pair[1]:
-            ruthAaronPair.append(pair)
+            ruthAaronPair.append((pair[2], pair[2]+1))
 
     return ruthAaronPair
 
@@ -34,6 +34,7 @@ def main(start, stop):
     pair = checkRuthAaronPair(start, stop)
     with open('result.txt', mode='w') as file:
         for p in pair:
+            print(p)
             file.write('{},{}\n'.format(p[0], p[1]))
 
 
