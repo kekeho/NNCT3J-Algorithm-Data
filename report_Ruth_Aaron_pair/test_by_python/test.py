@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import sympy
 import sys
+from numba import jit, int64
 
 
+@jit(int64(int64))
 def makePair(num):
     # num=2016 -> pair1={2: 5, 3: 2, 7: 1} (2^5 + 3^2 + 7^1)
     pair1_dict = sympy.factorint(num)
@@ -20,12 +22,13 @@ def makePair(num):
     return (x, y, num)
 
 
+@jit(int64(int64, int64))
 def checkRuthAaronPair(start, stop):
     ruthAaronPair = []
     for i in range(start, stop):
         pair = makePair(i)
         if pair[0] == pair[1]:
-            ruthAaronPair.append((pair[2], pair[2]+1))
+            ruthAaronPair.append((pair[2], pair[2] + 1))
 
     return ruthAaronPair
 

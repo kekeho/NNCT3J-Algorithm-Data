@@ -7,10 +7,11 @@
 
 # 依存関係のインストール
 Python3  
-必要なライブラリ: sympy  
+必要なライブラリ: sympy, numba  
 Python3がインストールされている環境で以下のコマンドを実行することでインストール可能。
 ```
 pip3 install sympy
+pip3 install numba
 ```
 
 # 使い方
