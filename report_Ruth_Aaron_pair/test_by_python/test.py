@@ -42,8 +42,11 @@ def main(start, stop):
 
 
 if __name__ == '__main__':
-    try:
-        main(int(sys.argv[1]), int(sys.argv[2]))
-    except IndexError as e:
-        print("ERROR!: missing arguments")
-        print("USAGE:\n\ttest.py <start> <end>")
+    START = 4294967296
+    STOP = 4294977295
+    # try:
+    #     main(int(sys.argv[1]), int(sys.argv[2]))
+    # except IndexError as e:
+    #     print("ERROR!: missing arguments")
+    #     print("USAGE:\n\ttest.py <start> <end>")
+    main(START, STOP)
