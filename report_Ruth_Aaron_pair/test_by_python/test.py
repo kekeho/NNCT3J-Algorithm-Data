@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import sympy
 import sys
-from numba import jit, int64
+from multiprocessing import Pool
+import multiprocessing as multi
 
 
-@jit(int64(int64))
 def makePair(num):
     # num=2016 -> pair1={2: 5, 3: 2, 7: 1} (2^5 + 3^2 + 7^1)
     pair1_dict = sympy.factorint(num)
@@ -22,23 +22,22 @@ def makePair(num):
     return (x, y, num)
 
 
-@jit(int64(int64, int64))
-def checkRuthAaronPair(start, stop):
-    ruthAaronPair = []
-    for i in range(start, stop):
-        pair = makePair(i)
-        if pair[0] == pair[1]:
-            ruthAaronPair.append((pair[2], pair[2] + 1))
-
-    return ruthAaronPair
+def checkRuthAaronPair(i):
+    pair = makePair(i)
+    if pair[0] == pair[1]:
+        return pair[2], pair[2] + 1
 
 
 def main(start, stop):
-    pair = checkRuthAaronPair(start, stop)
+    ruthAaronPair = []
+    p = Pool(multi.cpu_count())
+    ruthAaronPair = p.map(checkRuthAaronPair, range(start, stop))
+    print('Done!')
     with open('result.txt', mode='w') as file:
-        for p in pair:
-            print(p)
-            file.write('{},{}\n'.format(p[0], p[1]))
+        for p in ruthAaronPair:
+            if p != None:
+                print(p)
+                file.write('{},{}\n'.format(p[0], p[1]))
 
 
 if __name__ == '__main__':
