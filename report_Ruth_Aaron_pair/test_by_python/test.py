@@ -26,7 +26,7 @@ def makePair(num):
 
 
 def checkRuthAaronPair(i):
-    indicator(ALL, i - START)
+    # indicator(ALL, i - START)
     pair = makePair(i)
     if pair[0] == pair[1]:
         return pair[2], pair[2] + 1
