@@ -1,20 +1,25 @@
 #!/usr/bin/env python3
-import sympy
-import sys
-from multiprocessing import Pool
-import multiprocessing as multi
+import sympy #代数計算ライブラリ
+from multiprocessing import Pool #並列計算ライブラリ
+import multiprocessing as multi #CPUのスレッド数を特定するためのライブラリ
+import time
 
-START = 4294967296
-STOP = 4294977295
-ALL = STOP - START
+#計算範囲指定
+START =  4294967295+1
+STOP = 4295967296
 
+#(ルースアーロンか判定していない)ペアの生成
+#numとnum+1でペアの生成
 def makePair(num):
     # num=2016 -> pair1={2: 5, 3: 2, 7: 1} (2^5 + 3^2 + 7^1)
-    pair1_dict = sympy.factorint(num)
-    pair2_dict = sympy.factorint(num + 1)
+    #素因数のリストを生成
+    pair1_dict = sympy.factorint(num) #num
+    pair2_dict = sympy.factorint(num + 1) #num+1
 
-    x = 0
-    y = 0
+    x = 0 #numの素因数の和
+    y = 0 #num+1の素因数の和
+    
+    #加算処理
     for k, v in pair1_dict.items():
         for i in range(v):
             x += k
@@ -22,34 +27,30 @@ def makePair(num):
     for k, v in pair2_dict.items():
         for i in range(v):
             y += k
-    return (x, y, num)
+    return (x, y, num) #n
 
 
-def checkRuthAaronPair(i):
-    # indicator(ALL, i - START)
-    pair = makePair(i)
+#ルースアーロンペアかどうかのチェック
+def checkRuthAaronPair(num):
+    pair = makePair(num) #numとnum+1でペアの生成
+    #ルースアーロンペアかのチェック
     if pair[0] == pair[1]:
         return pair[2], pair[2] + 1
 
 
 def main(start, stop):
+    timer_start = time.time() #タイマースタート
     ruthAaronPair = []
-    p = Pool(multi.cpu_count())
-    ruthAaronPair = p.map(checkRuthAaronPair, range(start, stop))
-    print('Done!')
+    p = Pool(multi.cpu_count()) #スレッド数の指定
+    ruthAaronPair = p.map(checkRuthAaronPair, range(start, stop)) #並列処理
+    timer_result = time.time() - timer_start #タイマーストップ
+    print('Done! {} second'.format(timer_result))
+    #結果をファイルとコンソールに出力
     with open('result.txt', mode='w') as file:
         for p in ruthAaronPair:
             if p != None:
                 print(p)
                 file.write('{},{}\n'.format(p[0], p[1]))
 
-def indicator(all, now):
-    print('\rおおよその進捗: {now} / {all}'.format(now=now, all=all), end='')
-
 if __name__ == '__main__':
-    # try:
-    #     main(int(sys.argv[1]), int(sys.argv[2]))
-    # except IndexError as e:
-    #     print("ERROR!: missing arguments")
-    #     print("USAGE:\n\ttest.py <start> <end>")
-    main(START, STOP)
+    main(START, STOP) #実行
