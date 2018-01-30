@@ -7,15 +7,15 @@
 
 # 依存関係のインストール
 Python3  
-必要なライブラリ: sympy, numba  
+必要なライブラリ: sympy, multiprocessing
 Python3がインストールされている環境で以下のコマンドを実行することでインストール可能。
 ```
 pip3 install sympy
-pip3 install numba
+pip3 install multiprocessing
 ```
 
 # 使い方
-1~10までの間でアーロンペアを見つけたい場合
+1~10までの間でアーロンペアを見つけたい場合、まずtest.pyのSTARTとSTOPにそれぞれ1, 10を書き込んで
 ```
-python3 test.py 1 10
+python3 test.py
 ```
