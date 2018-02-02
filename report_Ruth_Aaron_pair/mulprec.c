@@ -400,6 +400,22 @@ int digits_calculation(const struct NUMBER *a){
   return -1; //error
 }
 
+//n桁右にシフトする。
+int shift(struct NUMBER *a, int up){
+  up++;
+  int now_digits = digits_calculation(a);
+  //オーバーフロー
+  if(now_digits+up >= KETA){
+    return -1;
+  }
+  //引き上げていくぅ!
+  for (int i = now_digits; i >= 0; i--) {
+    a->n[i+up] = a->n[i];
+    a->n[i] = 0;
+  }
+  return 0;
+}
+
 void diff(int count){
 	int i;
 	int x,y,z,w,r;
