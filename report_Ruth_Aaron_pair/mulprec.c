@@ -3,6 +3,16 @@
 #include <math.h>
 #define KETA 30
 
+#ifndef True
+#define True 1
+#endif
+#ifndef False
+#define False 0
+#endif
+#ifndef bool
+#define bool int
+#endif
+
 struct NUMBER{
   int n[KETA]; //各桁の値
   int sign; //符号変数(1なら正or0, -1なら負)
@@ -161,6 +171,7 @@ int getInt(const struct NUMBER *a, int *x){
   return 0;
 }
 
+//aが大きければ1, bが大きければ-1, 等しければ0;
 int numComp(const struct NUMBER *a, const struct NUMBER *b){
   if (getSign(a) > getSign(b)) {
     return 1;
@@ -375,6 +386,18 @@ int divide(const struct NUMBER *a,const struct NUMBER *b,struct NUMBER *c,struct
 	copyNumber(&n,d);
 
     return 0;
+}
+
+//桁数を返す。array[0]は1桁目でなく0桁目と数える。
+int digits_calculation(const struct NUMBER *a){
+  int keta;
+  for (int i = KETA-1; i >= 0; i--) {
+    if (a->n[i] != 0) {
+      keta = i;
+      return keta;
+    }
+  }
+  return -1; //error
 }
 
 void diff(int count){
