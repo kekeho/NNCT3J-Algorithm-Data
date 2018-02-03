@@ -77,6 +77,7 @@ void setRnd(struct NUMBER *a, int k){
 	}
 }
 
+//bにaをcopy
 void copyNumber(const struct NUMBER *a, struct NUMBER *b){
   setSign(b, getSign(a));
   for (int i = 0; i < KETA; i++) {
@@ -179,7 +180,7 @@ int numComp(const struct NUMBER *a, const struct NUMBER *b){
     return -1;
   } else {
     //aとbの符号が同じ
-    for (int i = KETA-1; i >= 0; i++) {
+    for (int i = KETA-1; i >= 0; i--) {
       if (a->n[i] > b->n[i]) {
         return 1;
       } else if (a->n[i] < b->n[i]) {
