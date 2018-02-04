@@ -450,3 +450,82 @@ void diff(int count){
 		}
 	}
 }
+
+//素因数分解用のシード
+int seeds[6] = {3, 5, 7 ,11, 13, 17};
+
+void f(struct NUMBER *x, struct NUMBER *n, int seed, struct NUMBER *ret){
+  struct NUMBER _seeds_seed_per_six, _seeds_x, _mul_x, _seed, a, c;
+  setInt(&_seeds_seed_per_six, seeds[seed % 6]);
+  multiple(&_seeds_seed_per_six, x, &_mul_x);
+  setInt(&_seed, seed);
+  add(&_mul_x, &seed, &a);
+  divide(&a, n, &c, ret);
+}
+
+void Gcd(struct NUMBER *a, struct NUMBER *b, struct NUMBER *ret){
+  if (numComp(b, a)) {
+    Gcd(b, a, ret);
+  }
+  
+  int _b; getInt(b, &_b);
+  if (_b == 0) {
+    ret = a; 
+  }
+  
+  struct NUMBER c, d; setInt(&d, 0);
+  int _check_d = 0;
+  do {
+    divide(a, b, &c, &d);
+    a = b;
+    b = &d;
+    getInt(&d, &_check_d);
+  } while(_check_d != 0);
+  ret = a;
+}
+
+//素因数分解をする。retはreturn
+void GetFactor(struct NUMBER *n, int seed, struct NUMBER *ret){
+  struct NUMBER two, kotae, amari;
+  setInt(&two, 2);
+
+  divide(n, &two , &kotae, &amari); //d <- n % 2
+  int if_n_per_two;
+  getInt(&amari, &if_n_per_two);
+
+  if (if_n_per_two == 0) {
+    setInt(ret, 2);
+  }
+
+  if(IsPrime(n)){
+    ret = n;
+  }
+
+  struct NUMBER x;
+  setInt(&x, 2);
+  struct NUMBER y;
+  setInt(&y, 2);
+  struct NUMBER d;
+  setInt(&d, 1);
+  
+  int if_d_equal_one;
+  getInt(&d, &if_d_equal_one);
+  while (if_d_equal_one == 1) {
+    f(&x, &n, seed, &x); //x = f(x, n, seed);
+    struct NUMBER f_ret;
+    f(&y, &n, seed, &f_ret);
+    f(&f_ret, &n, seed, &y); // y = f(f(y, n, seed), n, seed);
+    struct NUMBER x_minus_y;
+    struct NUMBER abs_x_minus_y;
+    sub(&x, &y, &x_minus_y);
+    getAbs(&x_minus_y, &abs_x_minus_y);
+    Gcd(&abs_x_minus_y, n, &d); //d = Gcd(abs(x - y), n);
+    getInt(&d, &if_d_equal_one);
+  }
+  //見つからない場合はシードを変えてチャレンジ
+  if (&d == n) {
+    GetFactor(n, seed+1, ret);
+  }
+  //素数でない場合再度チャレンジ
+  GetFactor(&d, 1, ret);
+}

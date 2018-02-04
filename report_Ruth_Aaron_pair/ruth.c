@@ -13,10 +13,15 @@
 #define bool int
 #endif
 
+
+
 int main() {
-  struct NUMBER a;
-  clearByZero(&a);
-  setInt(&a, 10);
-  // dispNumber(&a);
-  return 0;
+  struct NUMBER a, b, c, d, _ans;
+  setInt(&a, 50);
+  setInt(&b, 4);
+  divide(&a, &b, &c, &d);
+  multiple(&a, &b, &_ans);
+  //fastDivide(&a, &b, &c, &d);
+  dispNumber(&_ans);
+  putchar('\n');
 }
