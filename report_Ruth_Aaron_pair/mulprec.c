@@ -538,7 +538,19 @@ void diff(int count){
 int seeds[6] = {3, 5, 7 ,11, 13, 17};
 
 bool IsPrime(struct NUMBER *a){
+  struct NUMBER boundary;
+  struct NUMBER _num_1; setInt(&_num_1, 1);
+  struct NUMBER _num_2; setInt(&_num_2, 2);
+  int _int_a; getInt(a, &_int_a);
+  mul_sqrt(a, &boundary);
+  if (_int_a == 1) {
+    return False;
+  }
+  if (_int_a == 2) {
+    return True;
+  }
   
+  //TODO: for文で回す
 }
 void f(struct NUMBER *x, struct NUMBER *n, int seed, struct NUMBER *ret){
   struct NUMBER _seeds_seed_per_six, _seeds_x, _mul_x, _seed, a, c;
