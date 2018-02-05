@@ -35,9 +35,9 @@ void clearByZero(struct NUMBER *a){
 
 void dispNumber(const struct NUMBER *a){
   if (getSign(a) == 1) {
-    printf(" +");
+    printf("+");
   } else if (getSign(a) == -1) {
-    printf(" -");
+    printf("-");
   }
   
   for (int i = KETA-1; i >= 0; i--) {
@@ -58,7 +58,7 @@ void dispNumberZeroSuppress(const struct NUMBER *a){
   }
   
   for (; i >= 0; i--) {
-    printf("%2d", a->n[i]);
+    printf("%d", a->n[i]);
   }
 }
 
@@ -585,19 +585,21 @@ void Gcd(struct NUMBER *a, struct NUMBER *b, struct NUMBER *ret){
 }
 
 //素因数分解をする。retはreturn
-void GetFactor(struct NUMBER *n, int seed, struct NUMBER *ret){
-  printf("in getfactor\n");
+int GetFactor(struct NUMBER *n, struct NUMBER *ret){
+  dispNumber(n); printf("\r");
   struct NUMBER _one, _two; setInt(&_one, 1); setInt(&_two, 2);
   struct NUMBER kotae, amari;
   struct NUMBER _buf;
 
+  if(IsPrime(n) == True){
+    copyNumber(n, ret);
+    return 0;
+  }
+  
   divide(n, &_two , &kotae, &amari); //d(amari) <- n % 2
   if (isZero(&amari) == 0) {
     setInt(ret, 2);
-  }
-
-  if(IsPrime(n)){
-    ret = n;
+    return 0;
   }
 
   struct NUMBER x;
@@ -617,23 +619,55 @@ void GetFactor(struct NUMBER *n, int seed, struct NUMBER *ret){
     getAbs(&x_minus_y, &abs_x_minus_y);
     Gcd(&abs_x_minus_y, n, &d); //d = Gcd(abs(x - y), n);
   }
-  //見つからない場合はシードを変えてチャレンジ
+  //見つからない場合は再チャレンジ
   if (numComp(&d, n) == 0) {
-    printf("%s\n", "in if");
-    GetFactor(n, seed+1, ret);
+    GetFactor(n, ret);
+    return -1;
   }
+  
   //素数でない場合再度チャレンジ
-  GetFactor(&d, 1, ret);
+  GetFactor(&d, ret);
+  return 0;
 }
 
-void pollard(struct NUMBER *n, struct NUMBER *ret){
+void pollard(struct NUMBER *n){
   struct NUMBER _int_1; setInt(&_int_1, 1);
   struct NUMBER _buf, _nothing; //_nothingはdon't care
-  struct NUMBER factor;
-  while (numComp(n, &_int_1)) {
-    GetFactor(n, 1, &factor);
-    dispNumber(&factor);
-    divide(n, &factor, &_buf, &_nothing);
-    copyNumber(&_buf, n);
+  struct NUMBER factors1[KETA], factors2[KETA]; //とりあえずKETA個
+  struct NUMBER n_plus_one;
+  copyNumber(n, &_buf);
+  increment(&_buf, &n_plus_one);
+  
+  for (int i = 0; i < KETA; i++) {
+    clearByZero(&factors1[i]);
+    clearByZero(&factors2[i]);
   }
+  
+  int count = 0;
+  while (numComp(n, &_int_1)) {
+    GetFactor(n, &factors1[count]);
+    GetFactor(&n_plus_one, &factors2[count]);
+    divide(n, &factors1[count], &_buf, &_nothing);
+    copyNumber(&_buf, n);
+    divide(&n_plus_one, &factors2[count], &_buf, &_nothing);
+    copyNumber(&_buf, &n_plus_one);
+    count++;
+  }
+  
+  //ペアの生成
+  struct NUMBER ruth_1; clearByZero(&ruth_1);
+  struct NUMBER ruth_2; clearByZero(&ruth_2);
+  for (int i = 0; i < KETA; i++) {
+    add(&ruth_1, &factors1[i], &_buf);
+    copyNumber(&_buf, &ruth_1);
+    dispNumber(&factors2[i]); putchar('\n');
+    add(&ruth_2, &factors2[i], &_buf);
+    copyNumber(&_buf, &ruth_2);
+  }
+  
+  //等しければルースアーロンペア
+  
+    dispNumber(&ruth_1); printf(" , "); dispNumber(&ruth_2);
+    putchar('\n');
+  
 }
