@@ -90,6 +90,7 @@ void getAbs(const struct NUMBER *a, struct NUMBER *b){
   setSign(b, 1);
 }
 
+//zeroなら0, それ以外は-1を返す
 int isZero(const struct NUMBER *a){
   int i = 0;
   while (a->n[i] == 0 && i < KETA) {
@@ -209,13 +210,13 @@ int add(const struct NUMBER *a,const struct NUMBER *b,struct NUMBER *c){
 		}
 		if(getSign(b)==-1){
 			getAbs(b,&Babs);
-			ret=sub(a,&Babs,c);
+			ret = mul_sub(a,&Babs,c);
 		}
 	}
 	if(getSign(a)==-1){
 		if(getSign(b)==1){
 			getAbs(a,&Aabs);
-			ret=sub(b,&Aabs,c);
+			ret = mul_sub(b,&Aabs,c);
 		}
 		if(getSign(b)==-1){
 			getAbs(a,&Aabs);
@@ -232,7 +233,7 @@ int add(const struct NUMBER *a,const struct NUMBER *b,struct NUMBER *c){
 	return ret;
 }
 
-int sub(const struct NUMBER *a,const struct NUMBER *b,struct NUMBER *c){
+int mul_sub(const struct NUMBER *a,const struct NUMBER *b,struct NUMBER *c){
 	int i;
 	int h=0,buf;
 	int ret=0;
@@ -254,7 +255,7 @@ int sub(const struct NUMBER *a,const struct NUMBER *b,struct NUMBER *c){
 					c->n[i]=buf;
 				}
 			}else{
-				ret=sub(b,a,c);
+				ret=mul_sub(b,a,c);
 				setSign(c,-1);
 			}
 		}
@@ -297,7 +298,7 @@ int decrement(const struct NUMBER *a,struct NUMBER *b){
 	int ret;
 
 	setInt(&one,1);
-	ret = sub(a,&one,b);
+	ret = mul_sub(a,&one,b);
 
 	return ret;
 }
@@ -381,7 +382,7 @@ int divide(const struct NUMBER *a,const struct NUMBER *b,struct NUMBER *c,struct
         if(numComp(&n,b)==-1) break;
 		increment(c,&m);
 		copyNumber(&m,c);
-        sub(&n,b,&m);
+        mul_sub(&n,b,&m);
 		copyNumber(&m,&n);
 	}
 	copyNumber(&n,d);
@@ -437,7 +438,6 @@ int mul_sqrt(const struct NUMBER *N, struct NUMBER *ret){
 	copyNumber(&x, &c);
 
 	while(1){
-    printf("%s\n", "in while");
 		copyNumber(&b, &c);
 		copyNumber(&x, &b);	
     
@@ -492,7 +492,7 @@ int fastDivide(struct NUMBER *a, struct NUMBER *b, struct NUMBER *c, struct NUMB
 		copyNumber(&temp1, &x);
 		copyNumber(&temp2, &y);
 
-		sub(a, &x, &m);
+		mul_sub(a, &x, &m);
 		add(c, &y, &n);
 		copyNumber(&m, a);
 		copyNumber(&n, c);
@@ -537,10 +537,13 @@ void diff(int count){
 //素因数分解用のシード
 int seeds[6] = {3, 5, 7 ,11, 13, 17};
 
+//素数かどうかの判定: 合格
 bool IsPrime(struct NUMBER *a){
-  struct NUMBER boundary;
+  struct NUMBER boundary, _buf;
   struct NUMBER _num_1; setInt(&_num_1, 1);
   struct NUMBER _num_2; setInt(&_num_2, 2);
+  struct NUMBER _nothing; //don't care
+  struct NUMBER amari;
   int _int_a; getInt(a, &_int_a);
   mul_sqrt(a, &boundary);
   if (_int_a == 1) {
@@ -550,24 +553,24 @@ bool IsPrime(struct NUMBER *a){
     return True;
   }
   
-  //TODO: for文で回す
-}
-void f(struct NUMBER *x, struct NUMBER *n, int seed, struct NUMBER *ret){
-  struct NUMBER _seeds_seed_per_six, _seeds_x, _mul_x, _seed, a, c;
-  setInt(&_seeds_seed_per_six, seeds[seed % 6]);
-  multiple(&_seeds_seed_per_six, x, &_mul_x);
-  setInt(&_seed, seed);
-  add(&_mul_x, &seed, &a);
-  divide(&a, n, &c, ret);
+  struct NUMBER i; setInt(&i, 2); 
+  while(numComp(&i, &boundary) != 1){
+    divide(a, &i, &_nothing, &amari);
+    if (isZero(&amari) == 0) {
+      return False;
+    }
+    increment(&i, &_buf);
+    copyNumber(&_buf, &i);
+  }
+  
+  return True;
 }
 
 void Gcd(struct NUMBER *a, struct NUMBER *b, struct NUMBER *ret){
   if (numComp(b, a)) {
     Gcd(b, a, ret);
   }
-  
-  int _b; getInt(b, &_b);
-  if (_b == 0) {
+  if (isZero(b)) {
     ret = a; 
   }
   
@@ -577,21 +580,19 @@ void Gcd(struct NUMBER *a, struct NUMBER *b, struct NUMBER *ret){
     divide(a, b, &c, &d);
     a = b;
     b = &d;
-    getInt(&d, &_check_d);
-  } while(_check_d != 0);
+  } while(isZero(&d) != 0);
   ret = a;
 }
 
 //素因数分解をする。retはreturn
 void GetFactor(struct NUMBER *n, int seed, struct NUMBER *ret){
-  struct NUMBER two, kotae, amari;
-  setInt(&two, 2);
+  printf("in getfactor\n");
+  struct NUMBER _one, _two; setInt(&_one, 1); setInt(&_two, 2);
+  struct NUMBER kotae, amari;
+  struct NUMBER _buf;
 
-  divide(n, &two , &kotae, &amari); //d <- n % 2
-  int if_n_per_two;
-  getInt(&amari, &if_n_per_two);
-
-  if (if_n_per_two == 0) {
+  divide(n, &_two , &kotae, &amari); //d(amari) <- n % 2
+  if (isZero(&amari) == 0) {
     setInt(ret, 2);
   }
 
@@ -606,24 +607,33 @@ void GetFactor(struct NUMBER *n, int seed, struct NUMBER *ret){
   struct NUMBER d;
   setInt(&d, 1);
   
-  int if_d_equal_one;
-  getInt(&d, &if_d_equal_one);
-  while (if_d_equal_one == 1) {
-    f(&x, &n, seed, &x); //x = f(x, n, seed);
+  while (numComp(&d, &_one) == 1) {
+    setRnd(&x, 1);
     struct NUMBER f_ret;
-    f(&y, &n, seed, &f_ret);
-    f(&f_ret, &n, seed, &y); // y = f(f(y, n, seed), n, seed);
+    setRnd(&y, 1);
     struct NUMBER x_minus_y;
     struct NUMBER abs_x_minus_y;
-    sub(&x, &y, &x_minus_y);
+    mul_sub(&x, &y, &x_minus_y);
     getAbs(&x_minus_y, &abs_x_minus_y);
     Gcd(&abs_x_minus_y, n, &d); //d = Gcd(abs(x - y), n);
-    getInt(&d, &if_d_equal_one);
   }
   //見つからない場合はシードを変えてチャレンジ
-  if (&d == n) {
+  if (numComp(&d, n) == 0) {
+    printf("%s\n", "in if");
     GetFactor(n, seed+1, ret);
   }
   //素数でない場合再度チャレンジ
   GetFactor(&d, 1, ret);
+}
+
+void pollard(struct NUMBER *n, struct NUMBER *ret){
+  struct NUMBER _int_1; setInt(&_int_1, 1);
+  struct NUMBER _buf, _nothing; //_nothingはdon't care
+  struct NUMBER factor;
+  while (numComp(n, &_int_1)) {
+    GetFactor(n, 1, &factor);
+    dispNumber(&factor);
+    divide(n, &factor, &_buf, &_nothing);
+    copyNumber(&_buf, n);
+  }
 }
