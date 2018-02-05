@@ -417,6 +417,89 @@ int shift(struct NUMBER *a, int up){
   return 0;
 }
 
+//newton法による平方根の計算。b <- √(a)
+int mul_sqrt(const struct NUMBER *N, struct NUMBER *ret){
+  struct NUMBER x, b, c;
+	struct NUMBER _int_2; setInt(&_int_2, 2); //_int_2 = 2
+	struct NUMBER _nothing; //don't care
+  struct NUMBER _buf, _buf2;
+
+	clearByZero(ret);
+  divide(N, &_int_2, &x, &_nothing);
+  
+	if(isZero(&x) == 0){
+		copyNumber(N, ret);  //a = 0 または1なら√a=a
+		return 0;
+	}
+	if(getSign(&x) == -1) return -1;  //a<0 ならエラーで-1を返す
+
+	copyNumber(&x, &b);
+	copyNumber(&x, &c);
+
+	while(1){
+    printf("%s\n", "in while");
+		copyNumber(&b, &c);
+		copyNumber(&x, &b);	
+    
+    divide(N, &b, &_buf, &_nothing); // buf = N/b
+		add(&_buf, &b, &_buf2); //buf2 = b+(N/b)
+    divide(&_buf2, &_int_2, &x, &_nothing); //x = (b+(N/b)) / 2;
+    
+    int _comp_buf = numComp(&x, &b);
+		if(_comp_buf == 0) break;  //収束
+		if(numComp(&x, &c) == 0){       //振動
+			if(_comp_buf == 1) copyNumber(&b, &x); //小さいほうをとる
+			break;
+		}
+	}
+  
+  copyNumber(&x, ret);
+  return 0;
+}
+
+// 高速な割り算 a/b = c..d
+int fastDivide(struct NUMBER *a, struct NUMBER *b, struct NUMBER *c, struct NUMBER *d) {//改良divide
+	struct NUMBER x, y, temp1, temp2, m, n;
+
+	clearByZero(c);
+	clearByZero(d);
+
+	if (isZero(b) == 0)
+		return -1;
+
+	while (1) {
+		if (numComp(a, b) == -1) {
+			copyNumber(a, d);
+			return 0;
+		}
+
+		copyNumber(b, &x);
+		setInt(&y, 1);
+
+		while (1) {
+			mulBy10(&x, &temp1);
+			copyNumber(&temp1, &x);
+
+			mulBy10(&y, &temp2);
+			copyNumber(&temp2, &y);
+
+			if (numComp(a, &x) == -1)
+				break;
+		}
+
+		divBy10(&x, &temp1);
+		divBy10(&y, &temp2);
+		copyNumber(&temp1, &x);
+		copyNumber(&temp2, &y);
+
+		sub(a, &x, &m);
+		add(c, &y, &n);
+		copyNumber(&m, a);
+		copyNumber(&n, c);
+	}
+	return 0;
+}
+
 void diff(int count){
 	int i;
 	int x,y,z,w,r;
@@ -454,6 +537,9 @@ void diff(int count){
 //素因数分解用のシード
 int seeds[6] = {3, 5, 7 ,11, 13, 17};
 
+bool IsPrime(struct NUMBER *a){
+  
+}
 void f(struct NUMBER *x, struct NUMBER *n, int seed, struct NUMBER *ret){
   struct NUMBER _seeds_seed_per_six, _seeds_x, _mul_x, _seed, a, c;
   setInt(&_seeds_seed_per_six, seeds[seed % 6]);

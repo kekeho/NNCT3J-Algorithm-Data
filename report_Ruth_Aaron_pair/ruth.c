@@ -18,9 +18,9 @@
 int main() {
   struct NUMBER a, b, c, d, _ans;
   setInt(&a, 50);
-  setInt(&b, 4);
-  divide(&a, &b, &c, &d);
-  multiple(&a, &b, &_ans);
+  setInt(&b, 9);
+  int res = mul_sqrt(&b, &_ans);
+  printf("res: %d\n", res);
   //fastDivide(&a, &b, &c, &d);
   dispNumber(&_ans);
   putchar('\n');
