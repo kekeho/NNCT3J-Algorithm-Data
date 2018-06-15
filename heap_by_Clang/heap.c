@@ -42,6 +42,7 @@ int PrintAllHeap(heap *h){
     for (int i = 0; i <= h->size; i++) {
         printf("%d\n", h->box[i]);
     }
+    return 0;
 }
 
 void DeleteHeap(heap *h){
@@ -89,7 +90,8 @@ int main() {
     InsertHeap(&h, 4);
     InsertHeap(&h, 6);
     InsertHeap(&h, 1);
-    int hoge = TopHeap(&h);
+    int top = TopHeap(&h);
+    printf("TOPHEAP: %d", top);
     PrintAllHeap(&h);
     puts("------");
     DeleteHeap(&h);
