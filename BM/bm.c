@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define CHARNUM 95
+#define CHARNUM 95 //検索に対応する文字の数
 
 //文字列のカウント関数。文字列が与えられなかった場合は-1を返す。
 
@@ -122,9 +122,9 @@ int powerSearch(char const text[], char const pattern[]){
 }
 
 int main(int argc, char const *argv[]) {
-  if (argc == 4 && argv[3][1] == 'p') {
+  if (argc == 4 && argv[1][1] == 'p') {
     printf("OPTION: 力任せ法で検索します...\n");
-    int result = powerSearch(argv[1], argv[2]);
+    int result = powerSearch(argv[2], argv[3]);
     if (result == -1) {
       printf("ERROR: \"%s\"は含まれていません\n", argv[2]);
     } else{
@@ -146,7 +146,7 @@ int main(int argc, char const *argv[]) {
     return 0;
   } else if (argc == 2 && argv[1][1] == 'h'){
     //help
-    printf("HELP\n$ Usage:\n\tj15316.c 被検索文字列 検索キーワード [option]\n");
+    printf("HELP\n$ Usage:\n\tj15316.c [option] 被検索文字列 検索キーワード\n");
 
   } else {
     printf("引数を正しく指定してください\n$ Usage:\n\tj15316.c 被検索文字列 検索キーワード [option]\n");
