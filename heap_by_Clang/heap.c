@@ -39,7 +39,7 @@ int TopHeap(heap *h){
 }
 
 int PrintAllHeap(heap *h){
-    for (int i = 0; i <= h->size; i++) {
+    for (int i = 0; i < h->size; i++) {
         printf("%d\n", h->box[i]);
     }
     return 0;
@@ -49,6 +49,7 @@ void DeleteHeap(heap *h){
     int now = h->size-1;
     h->box[0] = h->box[now];
     now = 0;
+    h->size--;
         
     while (1) {
         int leftson = h->box[now*2+1];
@@ -75,7 +76,11 @@ void DeleteHeap(heap *h){
             break;
         }
     }
-    h->size--;
+    
+    //pop操作
+    for(int i = 0; i < h->size; i++){
+        h->box[i] = h->box[i+1];
+    }
 }
 
 int main() {
@@ -91,9 +96,12 @@ int main() {
     InsertHeap(&h, 6);
     InsertHeap(&h, 1);
     int top = TopHeap(&h);
-    printf("TOPHEAP: %d", top);
+    printf("TOPHEAP: %d\n", top);
     PrintAllHeap(&h);
     puts("------");
+    DeleteHeap(&h);
+    DeleteHeap(&h);
+    DeleteHeap(&h);
     DeleteHeap(&h);
     PrintAllHeap(&h);
     return 0;

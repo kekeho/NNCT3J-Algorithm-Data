@@ -70,9 +70,8 @@ void swap(int* num1, int* num2){
 
 void quickSort(int array[], int start, int end){
 	if (start != end && start < end){
-		int pivot;
 
-		pivot = takePivot(array, start, (end-start)/2, end);
+		int pivot = takePivot(array, start, (end-start)/2, end);
         printf("Pivot: %d\n", pivot);
 
 		int left = start;
